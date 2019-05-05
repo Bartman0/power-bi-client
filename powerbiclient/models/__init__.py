@@ -4,3 +4,7 @@ from .dataset_item import DatasetItem
 from .powerbi_auth import PowerBIAuth
 from .table_item import TableItem
 from .app_item import AppItem
+from .dashboard_item import DashboardItem
+from .report_item import ReportItem
+from .tile_item import TileItem
+from .workload_item import WorkloadItem

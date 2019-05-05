@@ -84,6 +84,12 @@ class Endpoint(object):
                                   auth_token=self.parent_srv.auth_token,
                                   content_type=content_type)
 
+    def patch_request(self, url, json_request, content_type='application/json'):
+        return self._make_request(self.parent_srv.session.patch, url,
+                                  content=json_request,
+                                  auth_token=self.parent_srv.auth_token,
+                                  content_type=content_type)
+
 
 def api(version):
     '''Annotate the minimum supported version for an endpoint.
