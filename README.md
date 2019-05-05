@@ -1,7 +1,7 @@
 # power-bi-client
 Power BI client API in Python
 
-Early development stage yet.
+Early development stage still.
 
 This library is based on the excellent Tableau server client API.
 It uses a very similar setup and structure.
