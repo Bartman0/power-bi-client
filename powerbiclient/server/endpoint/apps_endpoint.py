@@ -1,5 +1,5 @@
 from .endpoint import api, Endpoint
-from .. import AppItem
+from .. import AppItem, ReportItem, TileItem
 
 import logging
 
@@ -43,7 +43,7 @@ class Apps(Endpoint):
         logger.info('querying dashboards for app (ID: {0})'.format(app.id))
         url = "{0}/{1}/dashboards".format(self.baseurl, app.id)
         server_response = self.get_request(url)
-        return DashboardItem.from_response(server_response)
+        return DashboardItem.from_response(server_response, app)
 
     # get dashboard by id
     @api(version="1.0")
@@ -54,7 +54,7 @@ class Apps(Endpoint):
         logger.info('querying single dashboard (ID: {0}, app ID: {1})'.format(dashboard_id, app.id))
         url = "{0}/{1}/dashboards/{2}".format(self.baseurl, app.id, dashboard_id)
         server_response = self.get_request(url)
-        return DashboardItem.from_response(server_response)
+        return DashboardItem.from_response(server_response, app)
 
     # get reports
     @api(version="1.0")
@@ -87,7 +87,7 @@ class Apps(Endpoint):
         logger.info('querying tiles for app (ID: {0})'.format(app.id))
         url = "{0}/{1}/tiles".format(self.baseurl, app.id)
         server_response = self.get_request(url)
-        return TileItem.from_response(server_response)
+        return TileItem.from_response(server_response, app)
 
     # get tile by id
     @api(version="1.0")
@@ -98,4 +98,4 @@ class Apps(Endpoint):
         logger.info('querying single tile (ID: {0}, app ID: {1})'.format(tile_id, app.id))
         url = "{0}/{1}/tiles/{2}".format(self.baseurl, app.id, tile_id)
         server_response = self.get_request(url)
-        return TileItem.from_response(server_response)
+        return TileItem.from_response(server_response, app)

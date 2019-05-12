@@ -5,4 +5,6 @@ from .datasets_endpoint import Datasets
 from .exceptions import ServerResponseError, MissingRequiredFieldError, ServerInfoEndpointNotFoundError, NotSignedInError
 from .server_info_endpoint import ServerInfo
 from .apps_endpoint import Apps
-from .. import DatasetItem, CapacityItem, DashboardItem, WorkloadItem
+from .groups_endpoint import Groups
+from .features_endpoint import Features
+from .dashboards_endpoint import Dashboards

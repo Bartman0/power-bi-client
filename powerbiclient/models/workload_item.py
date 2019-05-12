@@ -3,7 +3,7 @@ from .item import Item
 
 class WorkloadItem(Item):
     @classmethod
-    def from_response(cls, capacity, resp):
+    def from_response(cls, resp, capacity=None):
         data = resp.json()
         if 'value' in data:
             values = data['value']
