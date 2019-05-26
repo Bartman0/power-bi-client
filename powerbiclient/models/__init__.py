@@ -13,3 +13,5 @@ from .user_item import UserItem
 from .dashboard_item import DashboardItem
 from .parameter_item import ParameterItem
 from .schedule_item import ScheduleItem
+from .datasource_item import DatasourceItem
+from .feature_item import FeatureItem

@@ -4,7 +4,7 @@ from ..request_factory import RequestFactory
 from .endpoint import api, Endpoint
 from .. import ReportItem
 
-logger = logging.getLogger('powerbi.endpoint.dashboards')
+logger = logging.getLogger('powerbi.endpoint.reports')
 
 
 class Reports(Endpoint):

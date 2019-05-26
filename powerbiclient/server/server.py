@@ -1,4 +1,4 @@
-from .endpoint import Auth, Capacities, Datasets, Tables, Apps, ServerInfo
+from .endpoint import Auth, Capacities, Datasets, Apps, ServerInfo
 
 import requests
 
@@ -15,7 +15,6 @@ class Server(object):
         self.capacities = Capacities(self)
         self.datasets = Datasets(self)
         self.apps = Apps(self)
-        self.tables = Tables(self)
         self.server_info = ServerInfo(self).get()
         self.version = self.server_info.rest_api_version    # the server version is equal to the API version
         self._server_address = "https://api.powerbi.com/v{0}/myorg".format(str(self.version))

@@ -34,6 +34,18 @@ class Datasets(Endpoint):
         server_response = self.get_request(url)
         return DatasetItem.from_response(server_response)[0]
 
+    # get dataset by name
+    @api(version="1.0")
+    def get_by_name(self, name, req_options=None):
+        logger.info('querying all datasets')
+        url = self.baseurl
+        server_response = self.get_request(url, req_options)
+        all_dataset_items = DatasetItem.from_response(server_response)
+        for item in all_dataset_items:
+            if item.name == name:
+                return item
+        return None
+
     # delete 1 dataset by id
     @api(version="1.0")
     def delete(self, dataset_id):
@@ -76,7 +88,7 @@ class Datasets(Endpoint):
         logger.info('querying all datasources in dataset')
         url = "{0}/{1}/datasources".format(self.baseurl, dataset.id)
         server_response = self.get_request(url, req_options)
-        all_datasource_items = DatasourceItem.from_response(dataset, server_response)
+        all_datasource_items = DatasourceItem.from_response(server_response, dataset)
         return all_datasource_items
 
     # get all parameters
@@ -88,7 +100,7 @@ class Datasets(Endpoint):
         logger.info('querying all parameters in dataset')
         url = "{0}/{1}/parameters".format(self.baseurl, dataset.id)
         server_response = self.get_request(url, req_options)
-        all_parameter_items = ParameterItem.from_response(dataset, server_response)
+        all_parameter_items = ParameterItem.from_response(server_response, dataset)
         return all_parameter_items
 
     # get all schedules
@@ -100,7 +112,7 @@ class Datasets(Endpoint):
         logger.info('querying all schedules in dataset')
         url = "{0}/{1}/refreshSchedule".format(self.baseurl, dataset.id)
         server_response = self.get_request(url, req_options)
-        all_schedule_items = ScheduleItem.from_response(dataset, server_response)
+        all_schedule_items = ScheduleItem.from_response(server_response, dataset)
         return all_schedule_items
 
     # get all tables
@@ -112,8 +124,23 @@ class Datasets(Endpoint):
         logger.info('querying all tables in dataset')
         url = "{0}/{1}/tables".format(self.baseurl, dataset.id)
         server_response = self.get_request(url, req_options)
-        all_table_items = TableItem.from_response(dataset, server_response)
+        all_table_items = TableItem.from_response(server_response, dataset)
         return all_table_items
+
+    # get table by name
+    @api(version="1.0")
+    def get_table_by_name(self, dataset, name, req_options=None):
+        if not dataset or not dataset.id:
+            error = "dataset ID undefined"
+            raise ValueError(error)
+        logger.info('querying all tables in dataset')
+        url = "{0}/{1}/tables".format(self.baseurl, dataset.id)
+        server_response = self.get_request(url, req_options)
+        all_table_items = TableItem.from_response(server_response, dataset)
+        for item in all_table_items:
+            if item.name == name:
+                return item
+        return None
 
     # post rows to a table
     @api(version="1.0")
