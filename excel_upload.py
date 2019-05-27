@@ -2,10 +2,10 @@ import argparse
 import logging
 
 import powerbiclient as PBC
-import random
-import datetime
-import time
 import openpyxl as xl
+
+
+EXCEL_TYPE_TO_POWERBI_TYPE = {"n": "Double", "d": "Date", "s": "String", "b": "Boolean"}
 
 
 def main():
@@ -22,7 +22,7 @@ def main():
 
     args = parser.parse_args()
 
-    # Set logging level based on user input, or error by default
+    # Set logging level based on user input
     logging_level = getattr(logging, args.logging_level.upper())
     logging.basicConfig(level=logging_level)
 
@@ -31,15 +31,23 @@ def main():
     server = PBC.Server()
 
     with server.auth.acquire_token(powerbi_auth):
+        # go through all Excel files
         for fname in args.workbook:
             wb = xl.load_workbook(filename=fname)
-            sheet = wb.active
-            dataset = server.datasets.get_by_name(fname)
+            sheet = wb.active   # select active sheet
+            dataset = server.datasets.get_by_name(fname)    # lookup any existing dataset by this filename
             data = []
-            for i, row in enumerate(sheet.values):
-                if i == 0:
-                    columns = [ { "name": c, "dataType": "String" } for c in row ]
-                    if dataset is None:
+            for row_i, row in enumerate(sheet.iter_rows()):
+                if row_i == 0:              # post dataset at the first row, or delete existing rows
+                    print("post dataset definition")
+                    # determine column definition: get names from row 1 and types from row 2 (openpyxl is 1-based)
+                    columns = [ { "name": sheet.cell(row=1,column=i+1).value,
+                                  "dataType": EXCEL_TYPE_TO_POWERBI_TYPE[c.data_type]}
+                                for i, c in enumerate(sheet[2]) ]
+                    print(columns)
+                    if dataset is not None:
+                        server.datasets.delete_rows(dataset, wb.sheetnames[0])
+                    else:
                         dataset = server.datasets.post_dataset(fname,
                             [
                                 {
@@ -49,8 +57,15 @@ def main():
                             ],
                             default_retention_policy='None'
                         )
-                else:
-                    data.append({ columns[i]['name']: c for i,c in enumerate(row) })
+                elif row_i % 10000 == 0:    # post rows every 10000 rows
+                    print("append data and post rows")
+                    data.append({ columns[i]['name']: c.value for i, c in enumerate(row) })
+                    server.datasets.post_rows(dataset, wb.sheetnames[0], data)
+                    data = []               # reset data block
+                else:                       # otherwise, just append data
+                    if row_i % 1000 == 0:   # print log line once per 1000 rows
+                        print("just append data, cycle {0}".format(row_i))
+                    data.append({ columns[i]['name']: c.value for i, c in enumerate(row) })
             server.datasets.post_rows(dataset, wb.sheetnames[0], data)
 
 
