@@ -35,6 +35,7 @@ def main():
         for fname in args.workbook:
             wb = xl.load_workbook(filename=fname)
             sheet = wb.active   # select active sheet
+            sheet_name = wb.sheetnames[0]
             dataset = server.datasets.get_by_name(fname)    # lookup any existing dataset by this filename
             data = []
             for row_i, row in enumerate(sheet.iter_rows()):
@@ -42,31 +43,33 @@ def main():
                     print("post dataset definition")
                     # determine column definition: get names from row 1 and types from row 2 (openpyxl is 1-based)
                     columns = [ { "name": sheet.cell(row=1,column=i+1).value,
-                                  "dataType": EXCEL_TYPE_TO_POWERBI_TYPE[c.data_type]}
+                                  "dataType": EXCEL_TYPE_TO_POWERBI_TYPE[c.data_type] }
                                 for i, c in enumerate(sheet[2]) ]
                     print(columns)
                     if dataset is not None:
-                        server.datasets.delete_rows(dataset, wb.sheetnames[0])
+                        # truncate table
+                        server.datasets.delete_rows(dataset, sheet_name)
                     else:
+                        # post dataset
                         dataset = server.datasets.post_dataset(fname,
                             [
                                 {
-                                    "name": wb.sheetnames[0],
+                                    "name": sheet_name,
                                     "columns": columns
                                 }
                             ],
                             default_retention_policy='None'
                         )
                 elif row_i % 10000 == 0:    # post rows every 10000 rows
-                    print("append data and post rows")
+                    print("append data and post rows, cycle {0}".format(row_i))
                     data.append({ columns[i]['name']: c.value for i, c in enumerate(row) })
-                    server.datasets.post_rows(dataset, wb.sheetnames[0], data)
+                    server.datasets.post_rows(dataset, sheet_name, data)
                     data = []               # reset data block
                 else:                       # otherwise, just append data
                     if row_i % 1000 == 0:   # print log line once per 1000 rows
                         print("just append data, cycle {0}".format(row_i))
                     data.append({ columns[i]['name']: c.value for i, c in enumerate(row) })
-            server.datasets.post_rows(dataset, wb.sheetnames[0], data)
+            server.datasets.post_rows(dataset, sheet_name, data)
 
 
 if __name__ == '__main__':
