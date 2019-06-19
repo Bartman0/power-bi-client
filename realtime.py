@@ -19,7 +19,7 @@ def main():
 
     args = parser.parse_args()
 
-    # Set logging level based on user input, or error by default
+    # Set logging level based on user input
     logging_level = getattr(logging, args.logging_level.upper())
     logging.basicConfig(level=logging_level)
 
