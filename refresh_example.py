@@ -9,7 +9,7 @@ import time
 
 def main():
 
-    parser = argparse.ArgumentParser(description='List datasets from Power-BI')
+    parser = argparse.ArgumentParser(description='Refresh one or more datasets in Power-BI')
     parser.add_argument('--application_id', '-i', required=True, help='application ID to sign into with')
     parser.add_argument('--application_secret', '-s', required=True, help='application secret to sign into with')
     parser.add_argument('--username', '-u', required=True, help='username to sign into with')
